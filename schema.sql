@@ -1,3 +1,5 @@
+SET GLOBAL time_zone = 'Europe/Moscow';
+
 CREATE DATABASE `yeticave`;
 
 USE `yeticave`;
@@ -5,6 +7,7 @@ USE `yeticave`;
 CREATE TABLE `categories` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
   `title` VARCHAR(64) DEFAULT NULL,
+  `class` VARCHAR(20) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -27,7 +30,7 @@ CREATE TABLE `lots` (
   `end_date` DATETIME DEFAULT NULL,
   `img` VARCHAR(64) DEFAULT NULL,
   `price` INT(11) DEFAULT NULL,
-  `min_bet` INT(11) DEFAULT NULL,
+  `bet_step` INT(11) DEFAULT NULL,
   `user_id` INT(11) DEFAULT NULL,
   `winner_id` INT(11) DEFAULT NULL,
   `category_id` INT(11) DEFAULT NULL,
@@ -43,7 +46,7 @@ CREATE TABLE `lots` (
 CREATE TABLE `bets` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
   `date` datetime DEFAULT NULL,
-  `cost` INT(11) DEFAULT NULL,
+  `value` INT(11) DEFAULT NULL,
   `user_id` INT(11) DEFAULT NULL,
   `lot_id` INT(11) DEFAULT NULL,
   PRIMARY KEY (`id`),

@@ -18,7 +18,7 @@
                         <div class="timer"><?=timeRemaining($bet['lot_date']);?></div> <!-- timer--finishing -->
                     </td>
                     <td class="rates__price">
-                        <?=$bet['cost'];?> р
+                        <?=$bet['value'];?> р
                     </td>
                     <td class="rates__time">
                         <?=formatTime($bet['bet_date']);?>

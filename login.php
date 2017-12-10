@@ -1,13 +1,17 @@
 <?php
+include "authorization.php";
 include "functions.php";
 include "mysql_helper.php";
 include "init.php";
-include "data.php";
-include "userdata.php";
-include "authorization.php";
 
-if($currentUser['isAuthorised']) {
+if($currentUser) {
     redirectTo();
+}
+
+try {
+    $categories = fetchAll($con, 'SELECT * FROM `categories`');
+} catch (Exception $e) {
+    renderErrorTemplate($e->getMessage(), $currentUser);
 }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -23,16 +27,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     if (!count($errors)) {
-        if ($user = searchUserByEmail($form['email'], $users)) {
-            if (password_verify($form['password'], $user['password'])) {
-                $_SESSION['user'] = $user;
-            }
-            else {
-                $errors['password'] = 'Неверный пароль';
-            }
+        $email = mysqli_real_escape_string($con, $form['email']);
+        $password = mysqli_real_escape_string($con, $form['password']);
+
+        try {
+            $user = fetchOne($con, "SELECT * FROM users WHERE email = '$email'");
+        } catch (Exception $e) {
+            renderErrorTemplate($e->getMessage(), $currentUser);
         }
-        else {
-            $errors['email'] = 'Такой пользователь не найден';
+
+        if (password_verify($form['password'], $user['password'])) {
+            $_SESSION['user'] = $user;
+            redirectTo();
+        } else {
+            $errors['all'] = 'Вы ввели неверный E-mail/пароль';
         }
     }
 
@@ -43,9 +51,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             'categories' => $categories,
         ]);
     }
-    else {
-        redirectTo();
-    }
 }
 else {
     $page_content = renderTemplate('templates/login.php', [
@@ -54,6 +59,7 @@ else {
 }
 
 $layout_content = renderTemplate('templates/layout.php', [
+    'categories' => $categories,
     'content' => $page_content,
     'title' => 'Вход на сайт',
     'mainClass' => '',

@@ -47,10 +47,12 @@
 </main>
 
 <footer class="main-footer">
-    <?php if(isset($currentCategory)): ?>
-        <?= renderTemplate('templates/nav.php', ['categories' => $categories, 'currentCategory' => $currentCategory]); ?>
-    <?php else: ?>
-        <?= renderTemplate('templates/nav.php', ['categories' => $categories]); ?>
+    <?php if(isset($categories)): ?>
+        <?php if(isset($currentCategory)): ?>
+            <?= renderTemplate('templates/nav.php', ['categories' => $categories, 'currentCategory' => $currentCategory]); ?>
+        <?php else: ?>
+            <?= renderTemplate('templates/nav.php', ['categories' => $categories]); ?>
+        <?php endif; ?>
     <?php endif; ?>
     <div class="main-footer__bottom container">
         <div class="main-footer__copyright">

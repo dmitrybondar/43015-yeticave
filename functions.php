@@ -28,7 +28,6 @@ function formatTime($date) {
 }
 
 function timeRemaining($date) {
-    date_default_timezone_set('Europe/Moscow');
     $end_date = strtotime($date);
     $now = strtotime('now');
     $remainingSeconds = $end_date - $now;

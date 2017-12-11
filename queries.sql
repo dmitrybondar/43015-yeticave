@@ -1,3 +1,5 @@
+USE `yeticave`;
+
 INSERT INTO `categories` (`id`, `title`, `class`) VALUES
 (1, 'Доски и лыжи', 'boards'),
 (2, 'Крепления', 'attachment'),

@@ -90,24 +90,3 @@ function fetchOne($con, $sql) {
         throw new Exception(mysqli_error($con));
     }
 }
-
-function pagination($con, $query, $queryValue, $pageItems, $sql) {
-    $pagination = [];
-    $pagination['curPage'] = (isset($_GET['page'])) ? intval($_GET['page']) : 1;
-    $pagination['pageItems'] = $pageItems;
-    $pagination['result'] = mysqli_query($con, $sql);
-    $pagination['itemsCount'] = mysqli_fetch_assoc($pagination['result'])['cnt'];
-    $pagination['pagesCount'] = ceil($pagination['itemsCount'] / $pagination['pageItems']);
-    $pagination['offset'] = ($pagination['curPage'] - 1) * $pagination['pageItems'];
-    $pagination['pages'] = range(1, $pagination['pagesCount']);
-
-    if ($query) {
-        $pagination['firstPage'] = $_SERVER['SCRIPT_NAME'] . "?" . $query . "=" . $queryValue;
-        $pagination['numberPage'] = $_SERVER['SCRIPT_NAME'] . "?" . $query . "=" . $queryValue . "&";
-    } else {
-        $pagination['firstPage'] = '/';
-        $pagination['numberPage'] = "?";
-    }
-
-    return $pagination;
-}

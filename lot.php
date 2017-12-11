@@ -14,7 +14,6 @@ try {
     renderErrorTemplate($e->getMessage(), $currentUser);
 }
 
-//Блок добавления ставки не показывается если: пользователь не авторизован, срок размещения лота истёк, лот создан текущим пользователем, пользователь уже добавлял ставку для этого лота
 if (!$currentUser || time() >= strtotime($lot['end_date']) || $lot['user_id'] == $currentUser['id'] || mysqli_num_rows(mysqli_query($con, "SELECT `user_id` FROM `bets` WHERE `lot_id` = '$lotId' AND `user_id` = '$currentUser[id]'")) > 0) {
     $canAddNewBet = false;
 } else {
@@ -57,7 +56,7 @@ $page_content = renderTemplate('templates/view.php', [
 $layout_content = renderTemplate('templates/layout.php', [
     'categories' => $categories,
     'content' => $page_content,
-    'title' => 'yeticave - Просмотр лота',
+    'title' => 'Просмотр лота ' . $lot['title'],
     'mainClass' => '',
     'currentUser' => $currentUser
 ]);

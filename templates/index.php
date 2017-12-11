@@ -14,5 +14,9 @@
         <h2>Открытые лоты</h2>
     </div>
     <?=renderTemplate('templates/list_lots.php', ['lots' => $lots]); ?>
-    <?=renderTemplate('templates/pagination.php', ['pagination' => $pagination]); ?>
+    <?=renderTemplate('templates/pagination.php', [
+        'pages' => $pages,
+        'pages_count' => $pages_count,
+        'cur_page' => $cur_page
+    ]); ?>
 </section>

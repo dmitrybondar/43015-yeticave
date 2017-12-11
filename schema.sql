@@ -1,5 +1,3 @@
-SET GLOBAL time_zone = 'Europe/Moscow';
-
 CREATE DATABASE `yeticave`;
 
 USE `yeticave`;

@@ -14,9 +14,9 @@
         <a href="/" class="main-header__logo">
             <img src="img/logo.svg" width="160" height="39" alt="Логотип компании YetiCave">
         </a>
-        <form class="main-header__search" method="get" action="https://echo.htmlacademy.ru">
-            <input type="search" name="search" placeholder="Поиск лота">
-            <input class="main-header__search-btn" type="submit" name="find" value="Найти">
+        <form class="main-header__search" method="get" action="search.php">
+            <input type="search" name="q" placeholder="Поиск лота">
+            <input class="main-header__search-btn" type="submit" value="Найти">
         </form>
         <a class="main-header__add-lot button" href="/add.php">Добавить лот</a>
         <nav class="user-menu">
@@ -47,16 +47,10 @@
 </main>
 
 <footer class="main-footer">
-    <?php if(isset($categories)): ?>
-        <nav class="nav">
-            <ul class="nav__list container">
-                <?php foreach($categories as $category): ?>
-                    <li class="nav__item">
-                        <a href="all-lots.html"><?=$category['title'];?></a>
-                    </li>
-                <?php endforeach; ?>
-            </ul>
-        </nav>
+    <?php if(isset($currentCategory)): ?>
+        <?= renderTemplate('templates/nav.php', ['categories' => $categories, 'currentCategory' => $currentCategory]); ?>
+    <?php else: ?>
+        <?= renderTemplate('templates/nav.php', ['categories' => $categories]); ?>
     <?php endif; ?>
     <div class="main-footer__bottom container">
         <div class="main-footer__copyright">

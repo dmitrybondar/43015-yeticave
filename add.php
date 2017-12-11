@@ -1,13 +1,17 @@
 <?php
+include "authorization.php";
 include "functions.php";
 include "mysql_helper.php";
 include "init.php";
-include "data.php";
-include "authorization.php";
 
-if (!isset($_SESSION['user'])) {
-    http_response_code(403);
-    exit();
+if (!$currentUser) {
+    redirectTo('/login.php');
+}
+
+try {
+    $categories = fetchAll($con, 'SELECT * FROM `categories`');
+} catch (Exception $e) {
+    renderErrorTemplate($e->getMessage(), $currentUser);
 }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -18,13 +22,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         'description',
         'category',
         'price',
-        'min-cost',
-        'date',
-        'img'
+        'bet_step',
+        'end_date',
     ];
     $is_numeric = [
         'price',
-        'min-cost'
+        'bet_step'
     ];
 
     $errors = [];
@@ -34,21 +37,29 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $errors[$name] = 'Это поле надо заполнить';
         }
     }
+
     foreach ($is_numeric as $name) {
-        if (array_key_exists($name, $lot) && $lot[$name] && !is_numeric($lot[$name])) {
-            $errors[$name] = 'Введите числовое значение';
+        if (array_key_exists($name, $lot) && $lot[$name] && (!is_numeric($lot[$name]) || intval($lot[$name]) <= 0)) {
+            $errors[$name] = 'Введите число больше нуля';
         }
     }
 
-    if (!empty($_FILES['img']['name'])) {
-        $tmp_name = $_FILES['img']['tmp_name'];
-        $path = 'img/uploads/' . $_FILES['img']['name'];
-        $file_type = $_FILES['img']['type'];
+    if (!isset($errors['bet_step']) && !is_int($lot['bet_step']+0)) { //+0 позволяет конвертировать строку в число
+        $errors['bet_step'] = 'Введите целое число';
+    }
 
-        if ($file_type !== "image/jpeg") {
-            $errors['img'] = 'Загрузите картинку в формате jpg';
+    if(strtotime($lot['end_date']) < strtotime('tomorrow')) {
+        $errors['end_date'] = 'Введите дату больше текущей даты';
+    }
+
+    if (!empty($_FILES['img']['name'])) {
+        $tmpName = $_FILES['img']['tmp_name'];
+        $path = 'img/uploads/' . $_FILES['img']['name'];
+        $fileType = mime_content_type($tmpName);
+        if ($fileType !== "image/jpeg" && $fileType !== "image/png") {
+            $errors['img'] = 'Загрузите картинку в формате jpg или png';
         } else {
-            move_uploaded_file($tmp_name, $path);
+            move_uploaded_file($tmpName, $path);
             $lot['img'] = $path;
         }
     } else {
@@ -62,11 +73,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             'categories' => $categories,
         ]);
     } else {
-        $page_content = renderTemplate('templates/view.php', [
-            'lot' => $lot,
-            'categories' => $categories,
-            'bets' => $bets,
-        ]);
+        mysqli_report(MYSQLI_REPORT_ALL);
+        try {
+            $sql = "INSERT INTO lots (`start_date`, `category_id`, `user_id`, `title`, `description`, `end_date`, `price`, `bet_step`, `img`) VALUES (NOW(), ?, '$currentUser[id]', ?, ?, ?, ?, ?, ?)";
+            $stmt = mysqli_prepare($con, $sql);
+            mysqli_stmt_bind_param($stmt, 'isssiis', $lot['category'], $lot['title'], $lot['description'], $lot['end_date'], $lot['price'], $lot['bet_step'], $lot['img']);
+            mysqli_stmt_execute($stmt);
+        } catch (Exception $e) {
+            renderErrorTemplate($e->getMessage(), $currentUser);
+        }
+
+        $lot_id = mysqli_insert_id($con);
+        redirectTo("/lot.php?lot_id=" . $lot_id);
     }
 } else {
     $page_content = renderTemplate('templates/add_lot.php', [
@@ -75,6 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 
 $layout_content = renderTemplate('templates/layout.php', [
+    'categories' => $categories,
     'content' => $page_content,
     'title' => 'Добавить лот',
     'mainClass' => '',

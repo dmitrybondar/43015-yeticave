@@ -37,7 +37,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     if (!empty($_FILES['avatar']['name'])) {
         $tmpName = $_FILES['avatar']['tmp_name'];
-        $path = 'img/avatars/' . $_FILES['avatar']['name'];
+        $folder = 'img/avatars/';
+        if (!file_exists($folder)) {
+            mkdir($folder, 0777, true);
+        }
+        $path = $folder . $_FILES['avatar']['name'];
         $fileType = mime_content_type($tmpName);
         if ($fileType !== "image/jpeg" && $fileType !== "image/png") {
             $errors['avatar'] = 'Загрузите картинку в формате jpg или png';

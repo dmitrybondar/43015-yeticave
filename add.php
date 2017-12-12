@@ -1,7 +1,6 @@
 <?php
 include "authorization.php";
 include "functions.php";
-include "mysql_helper.php";
 include "init.php";
 
 if (!$currentUser) {
@@ -77,6 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             'categories' => $categories,
         ]);
     } else {
+        $lot = array_map('htmlspecialchars', $lot);
         mysqli_report(MYSQLI_REPORT_ALL);
         try {
             $sql = "INSERT INTO lots (`start_date`, `category_id`, `user_id`, `title`, `description`, `end_date`, `price`, `bet_step`, `img`) VALUES (NOW(), ?, '$currentUser[id]', ?, ?, ?, ?, ?, ?)";

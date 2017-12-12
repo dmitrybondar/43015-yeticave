@@ -1,7 +1,6 @@
 <?php
 include "authorization.php";
 include "functions.php";
-include "mysql_helper.php";
 include "init.php";
 
 if($currentUser) {

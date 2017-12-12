@@ -1,7 +1,6 @@
 <?php
 include "authorization.php";
 include "functions.php";
-include "mysql_helper.php";
 include "init.php";
 
 if($currentUser) {
@@ -52,6 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     if (!count($errors)) {
+        $form = array_map('htmlspecialchars', $form);
         mysqli_report(MYSQLI_REPORT_ALL);
 
         $email = mysqli_real_escape_string($con, $form['email']);
